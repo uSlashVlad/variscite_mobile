@@ -39,7 +39,7 @@ class ApiCubit extends Cubit<ApiState> {
     emit(ApiTokensLoaded(tokenCount));
   }
 
-  Future<void> addApiToken(String token) async {
+  Future<void> addUserData(String id, String token) async {
     _tokensBox ??= await _initTokenBox();
 
     _tokensBox!.add(token);

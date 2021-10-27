@@ -4,7 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'widgets/map_widget.dart';
 import 'package:variscite_mobile/bloc/api_cubit.dart';
 import 'package:variscite_mobile/utils/geometry/geometry_processing.dart';
-import 'package:variscite_mobile/bloc/geometry_cubit.dart';
+import 'package:variscite_mobile/bloc/map_screen/geometry_cubit.dart';
 
 class MapScreen extends StatelessWidget {
   /// /map
@@ -56,17 +56,18 @@ class InitialLoadingBuilder extends StatelessWidget {
     try {
       MapGeometryCollection? result;
 
-      for (var api in context.read<ApiCubit>().groupsApi) {
-        final structs = await api.getAllStructures();
-        if (result == null) {
-          result = createGeometryCollection(structs);
-        } else {
-          result.mergeWith(createGeometryCollection(structs));
-        }
+      // TODO add group switcher
+      final api = context.read<ApiCubit>().groupsApi[0];
+      final structs = await api.getAllStructures();
+      if (result == null) {
+        result = createGeometryCollection(structs!);
+      } else {
+        result.mergeWith(createGeometryCollection(structs!));
       }
 
-      return result!;
+      return result;
     } catch (e) {
+      // TODO show an error
       print(e);
       return const MapGeometryCollection();
     }

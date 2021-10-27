@@ -68,12 +68,13 @@ class _LoginForm extends StatelessWidget {
 
       final context = _formKey.currentContext!;
       try {
-        final userToken = await ApiHandler().login(
+        final userData = await ApiHandler().login(
           data['invite_code'],
           data['username'],
           data['is_admin'] ? data['pass_code'] : null,
         );
-        context.read<ApiCubit>().addApiToken(userToken);
+
+        context.read<ApiCubit>().addUserData(userData!.userId, userData.token);
       } catch (e) {
         // TODO show an error
         print(e);

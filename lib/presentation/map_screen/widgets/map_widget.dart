@@ -6,7 +6,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:variscite_mobile/utils/consts.dart';
 import 'cached_tiles.dart';
 import 'package:variscite_mobile/utils/geometry/geometry_processing.dart';
-import 'package:variscite_mobile/bloc/geometry_cubit.dart';
+import 'package:variscite_mobile/bloc/map_screen/geometry_cubit.dart';
 
 class MapWidget extends StatelessWidget {
   const MapWidget({Key? key}) : super(key: key);
