@@ -4,7 +4,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import 'cached_tiles.dart';
-import 'package:variscite_mobile/bloc/map_screen/geometry_cubit.dart';
+import 'package:variscite_mobile/presentation/map_screen/bloc/geometry_cubit.dart';
 import 'package:variscite_mobile/utils/geometry/map_geometry.dart';
 import 'package:variscite_mobile/utils/consts.dart';
 

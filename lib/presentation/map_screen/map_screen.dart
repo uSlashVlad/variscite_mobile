@@ -3,10 +3,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:variscite_mobile/bloc/api_cubit.dart';
 
 import 'widgets/map_widget.dart';
-import 'package:variscite_mobile/bloc/map_screen/geometry_cubit.dart';
+import 'package:variscite_mobile/presentation/map_screen/bloc/geometry_cubit.dart';
 import 'package:variscite_mobile/utils/consts.dart';
 
 class MapScreen extends StatelessWidget {
+  /// /map
   static String route = '/map';
 
   const MapScreen({Key? key}) : super(key: key);
@@ -23,7 +24,6 @@ class MapScreen extends StatelessWidget {
               final geometryC = context.read<GeometryCubit>();
 
               apiC.api.getAllStructures().then((value) {
-                print(value);
                 geometryC.loadStructuresToMap(value);
               });
 
