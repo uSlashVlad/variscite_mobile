@@ -85,20 +85,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.1"
-  cupertino_icons:
-    dependency: "direct main"
-    description:
-      name: cupertino_icons
-      url: "https://pub.dartlang.org"
-    source: hosted
-    version: "1.0.3"
   dio:
     dependency: "direct main"
     description:
       name: dio
       url: "https://pub.dartlang.org"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.1"
   equatable:
     dependency: "direct main"
     description:
@@ -544,6 +537,13 @@ packages:
       url: "https://pub.dartlang.org"
     source: hosted
     version: "3.0.4"
+  variscite_dart:
+    dependency: "direct main"
+    description:
+      path: "../variscite_dart"
+      relative: true
+    source: path
+    version: "0.1.2"
   vector_math:
     dependency: transitive
     description:
@@ -573,5 +573,5 @@ packages:
     source: hosted
     version: "0.2.0"
 sdks:
-  dart: ">=2.14.0 <3.0.0"
+  dart: ">=2.14.3 <3.0.0"
   flutter: ">=2.5.0"
