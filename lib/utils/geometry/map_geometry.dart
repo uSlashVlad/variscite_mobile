@@ -25,17 +25,17 @@ class MapGeometry extends Equatable {
     List<Polygon> polygons = const [],
   }) {
     return MapGeometry(
-      markers: [...this.markers, ...markers],
-      lines: [...this.lines, ...lines],
-      polygons: [...this.polygons, ...polygons],
+      markers: markers,
+      lines: lines,
+      polygons: polygons,
     );
   }
 
   MapGeometry mergeWith(MapGeometry otherCollection) {
     return copyWith(
-      markers: otherCollection.markers,
-      lines: otherCollection.lines,
-      polygons: otherCollection.polygons,
+      markers: [...markers, ...otherCollection.markers],
+      lines: [...lines, ...otherCollection.lines],
+      polygons: [...polygons, ...otherCollection.polygons],
     );
   }
 
@@ -80,7 +80,7 @@ class MapGeometry extends Equatable {
         final point = feature.geometry as GeoJSONPoint;
         final style = _parseMarkerStyle(feature.properties);
         return Marker(
-          point: _convertLngLatList(point.coordinates),
+          point: GeometryHelper.convertLngLatList(point.coordinates),
           builder: (context) => MarkerWidget(style: style),
         );
 
@@ -89,9 +89,9 @@ class MapGeometry extends Equatable {
         final style = _parseLineStyle(feature.properties);
         final points = <LatLng>[];
         for (var coordinates in line.coordinates) {
-          points.add(_convertLngLatList(coordinates));
+          points.add(GeometryHelper.convertLngLatList(coordinates));
         }
-        // TODO use opacity property to polyline
+        // TODO use opacity property in polyline
         return Polyline(
           points: points,
           color: style.strokeColor,
@@ -103,16 +103,17 @@ class MapGeometry extends Equatable {
         final style = _parsePolygonStyle(feature.properties);
         final points = <LatLng>[];
         for (var coordinates in polygon.coordinates[0]) {
-          points.add(_convertLngLatList(coordinates));
+          points.add(GeometryHelper.convertLngLatList(coordinates));
         }
         final holePoints = <List<LatLng>>[];
         for (var i = 1; i < polygon.coordinates.length; i++) {
           final holes = <LatLng>[];
           for (var coordinates in polygon.coordinates[i]) {
-            holes.add(_convertLngLatList(coordinates));
+            holes.add(GeometryHelper.convertLngLatList(coordinates));
           }
           holePoints.add(holes);
         }
+        // TODO use opacity property in polygon
         return Polygon(
           points: points,
           holePointsList: holePoints,
@@ -139,10 +140,15 @@ class MapGeometry extends Equatable {
   static MarkerStyle _parseMarkerStyle(Map<String, dynamic>? properties) {
     if (properties != null) {
       Color? color;
+      Color? outlineColor;
       if (properties.containsKey('marker-color')) {
-        color = Color(_hexToIntColor(properties['marker-color']));
+        color = Color(GeometryHelper.hexToIntColor(properties['marker-color']));
       }
-      return MarkerStyle(color: color);
+      if (properties.containsKey('outline-color')) {
+        outlineColor =
+            Color(GeometryHelper.hexToIntColor(properties['outline-color']));
+      }
+      return MarkerStyle(color: color, outlineColor: outlineColor);
     } else {
       return MarkerStyle();
     }
@@ -152,7 +158,7 @@ class MapGeometry extends Equatable {
     if (properties != null) {
       Color? color;
       if (properties.containsKey('stroke')) {
-        color = Color(_hexToIntColor(properties['stroke']));
+        color = Color(GeometryHelper.hexToIntColor(properties['stroke']));
       }
       num? width;
       if (properties.containsKey('stroke-width')) {
@@ -164,8 +170,8 @@ class MapGeometry extends Equatable {
       }
       return LineStyle(
         color: color,
-        width: _numOrNullToDouble(width, 4),
-        opacity: _numOrNullToDouble(opacity, 1),
+        width: GeometryHelper.numOrNullToDouble(width, 4),
+        opacity: GeometryHelper.numOrNullToDouble(opacity, 1),
       );
     } else {
       return LineStyle();
@@ -176,7 +182,7 @@ class MapGeometry extends Equatable {
     if (properties != null) {
       Color? strokeColor;
       if (properties.containsKey('stroke')) {
-        strokeColor = Color(_hexToIntColor(properties['stroke']));
+        strokeColor = Color(GeometryHelper.hexToIntColor(properties['stroke']));
       }
       num? width;
       if (properties.containsKey('stroke-width')) {
@@ -188,7 +194,7 @@ class MapGeometry extends Equatable {
       }
       Color? fill;
       if (properties.containsKey('fill')) {
-        fill = Color(_hexToIntColor(properties['fill']));
+        fill = Color(GeometryHelper.hexToIntColor(properties['fill']));
       }
       num? fillOpacity;
       if (properties.containsKey('fill-opacity')) {
@@ -196,29 +202,15 @@ class MapGeometry extends Equatable {
       }
       return PolygonStyle(
         strokeColor: strokeColor,
-        strokeWidth: _numOrNullToDouble(width, 4),
-        strokeOpacity: _numOrNullToDouble(strokeOpacity, 1),
+        strokeWidth: GeometryHelper.numOrNullToDouble(width, 4),
+        strokeOpacity: GeometryHelper.numOrNullToDouble(strokeOpacity, 1),
         fillColor: fill,
-        fillOpacity: _numOrNullToDouble(fillOpacity, 1),
+        fillOpacity: GeometryHelper.numOrNullToDouble(fillOpacity, 1),
       );
     } else {
       return PolygonStyle();
     }
   }
-
-  static double _numOrNullToDouble(num? number, double defaultValue) {
-    if (number != null) {
-      return number.toDouble();
-    } else {
-      return defaultValue;
-    }
-  }
-
-  static int _hexToIntColor(String colorString, [String opacity = 'ff']) =>
-      int.parse(colorString.replaceFirst('#', '0x' + opacity));
-
-  static LatLng _convertLngLatList(List<double> coordinates) =>
-      LatLng(coordinates[1], coordinates[0]);
 
   @override
   String toString() {
@@ -228,4 +220,92 @@ class MapGeometry extends Equatable {
 
   @override
   List<Object?> get props => [markers, lines, polygons];
+}
+
+class LocationsCollection extends Equatable {
+  const LocationsCollection({
+    this.currentUserMarker,
+    this.otherUsersMarkers = const [],
+  });
+
+  final Marker? currentUserMarker;
+  final List<Marker> otherUsersMarkers;
+
+  List<Marker> get locationMarkers {
+    if (currentUserMarker == null) {
+      return otherUsersMarkers;
+    } else {
+      return [...otherUsersMarkers, currentUserMarker!];
+    }
+  }
+
+  LocationsCollection updateUserPosition(LatLng position) {
+    return copyWith(
+        currentUserMarker: Marker(
+      point: position,
+      builder: (context) => MarkerWidget(style: _currentUserMarkerStyle),
+    ));
+  }
+
+  LocationsCollection updateOthersPosition(
+      List<UserGeolocationOutput> geolocations) {
+    return copyWith(
+        otherUsersMarkers: geolocations
+            .map((l) => Marker(
+                  point: LatLng(l.position.latitude, l.position.longitude),
+                  builder: (context) =>
+                      MarkerWidget(style: _otherUsersMarkerStyle),
+                ))
+            .toList());
+  }
+
+  LocationsCollection copyWith({
+    Marker? currentUserMarker,
+    List<Marker>? otherUsersMarkers,
+  }) {
+    return LocationsCollection(
+      currentUserMarker: currentUserMarker ?? this.currentUserMarker,
+      otherUsersMarkers: otherUsersMarkers ?? this.otherUsersMarkers,
+    );
+  }
+
+  static MarkerStyle get _currentUserMarkerStyle => MarkerStyle(
+        color: Colors.white,
+        outlineColor: Colors.blueAccent[400],
+      );
+
+  static MarkerStyle get _otherUsersMarkerStyle => MarkerStyle(
+        color: Colors.grey[200],
+        outlineColor: Colors.greenAccent[400],
+      );
+
+  // props method here generates list with latitude, longitude of each marker
+  @override
+  List<Object?> get props => [
+        (currentUserMarker != null)
+            ? [
+                currentUserMarker!.point.latitude,
+                currentUserMarker!.point.longitude
+              ]
+            : null,
+        ...otherUsersMarkers
+            .map((m) => [m.point.latitude, m.point.longitude])
+            .toList(),
+      ];
+}
+
+abstract class GeometryHelper {
+  static double numOrNullToDouble(num? number, double defaultValue) {
+    if (number != null) {
+      return number.toDouble();
+    } else {
+      return defaultValue;
+    }
+  }
+
+  static int hexToIntColor(String colorString, [String opacity = 'ff']) =>
+      int.parse(colorString.replaceFirst('#', '0x' + opacity));
+
+  static LatLng convertLngLatList(List<double> coordinates) =>
+      LatLng(coordinates[1], coordinates[0]);
 }

@@ -1,7 +1,7 @@
 name: variscite_mobile
 description: A new Flutter project.
 publish_to: 'none'
-version: 0.2.1+2
+version: 0.2.2+2
 
 environment:
   sdk: ">=2.14.0 <3.0.0"

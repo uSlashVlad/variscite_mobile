@@ -12,9 +12,16 @@ class MarkerWidget extends StatelessWidget {
     return Container(
       width: 20,
       height: 20,
+      padding: const EdgeInsets.all(3),
       decoration: BoxDecoration(
-        color: style.color,
+        color: style.outlineColor,
         borderRadius: BorderRadius.circular(20),
+      ),
+      child: Container(
+        decoration: BoxDecoration(
+          color: style.color,
+          borderRadius: BorderRadius.circular(20),
+        ),
       ),
     );
   }
