@@ -2,7 +2,7 @@ import 'package:bloc/bloc.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:variscite_dart/variscite_dart.dart';
 
-import 'package:variscite_mobile/utils/geometry/map_geometry.dart';
+import 'package:variscite_mobile/utils/geometry/locations_collection.dart';
 
 class LocationCubit extends Cubit<LocationsCollection> {
   LocationCubit([LocationsCollection? defaultLocations])

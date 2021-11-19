@@ -18,5 +18,4 @@ Future<bool> requestPermissions() async {
   return true;
 }
 
-Stream<Position> get positionStream =>
-    Geolocator.getPositionStream();
+Stream<Position> getPositionStream() => Geolocator.getPositionStream();

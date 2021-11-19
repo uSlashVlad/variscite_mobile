@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/map_view_cubit.dart';
+import 'package:variscite_mobile/presentation/user_screen/user_screen.dart';
 
 class LocatorButton extends StatelessWidget {
   const LocatorButton({
@@ -43,15 +44,33 @@ class ResetRotationButton extends StatelessWidget {
   }
 }
 
+class UserSettingsButton extends StatelessWidget {
+  const UserSettingsButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return MapUiButton(
+      Icons.account_circle_outlined,
+      backgroundColor: theme.primaryColor,
+      color: theme.iconTheme.color,
+      onPressed: () => Navigator.pushNamed(context, UserScreen.route),
+    );
+  }
+}
+
 class MapUiButton extends StatelessWidget {
   const MapUiButton(
     this.icon, {
     Key? key,
+    this.color,
     this.backgroundColor,
     this.onPressed,
   }) : super(key: key);
 
   final IconData icon;
+  final Color? color;
   final Color? backgroundColor;
   final void Function()? onPressed;
 
@@ -70,6 +89,7 @@ class MapUiButton extends StatelessWidget {
           iconSize: 28,
           onPressed: onPressed,
           icon: Icon(icon),
+          color: color,
         ),
       ),
     );

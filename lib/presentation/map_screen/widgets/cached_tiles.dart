@@ -4,7 +4,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 
 class CachedTileProvider extends TileProvider {
   const CachedTileProvider();
-  
+
   @override
   ImageProvider getImage(Coords<num> coords, TileLayerOptions options) {
     return CachedNetworkImageProvider(

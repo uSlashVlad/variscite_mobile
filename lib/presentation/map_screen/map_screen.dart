@@ -13,10 +13,11 @@ import 'bloc/locations_cubit.dart';
 import 'bloc/map_view_cubit.dart';
 import 'package:variscite_mobile/utils/consts.dart';
 import 'package:variscite_mobile/utils/geolocation.dart';
+import 'package:variscite_mobile/presentation/common/toasts.dart';
 
 class MapScreen extends StatelessWidget {
-  /// /map
-  static String route = '/map';
+  /// /main
+  static String route = '/main';
 
   const MapScreen({Key? key}) : super(key: key);
 
@@ -29,20 +30,34 @@ class MapScreen extends StatelessWidget {
           final locationC = LocationCubit();
           final apiC = context.read<ApiCubit>();
           int i = 0;
+
+          // FIXME here is temporary fix of leavig group, but timers and streams
+          // should be closed gracefully
           Timer.periodic(const Duration(seconds: 2), (timer) {
-            apiC.api
-                .getAllGeolocation(excludeUser: true)
-                .then((value) => locationC.updateOthersLocation(value));
-          });
-          positionStream.listen((pos) {
-            if (i % 10 == 0) {
-              apiC.api.editCurrentUserGeolocation(GeolocationPosition(
-                latitude: pos.latitude,
-                longitude: pos.longitude,
-              ));
+            if (apiC.api.hasToken && apiC.state is! ApiTokenDeleted) {
+              apiC.api
+                  .getAllGeolocation(excludeUser: true)
+                  .then((value) => locationC.updateOthersLocation(value));
+            } else {
+              showError('Token was deleted');
+              timer.cancel();
             }
-            locationC.updateUserLocation(LatLng(pos.latitude, pos.longitude));
-            i++;
+          });
+          late final StreamSubscription streamSub;
+          streamSub = getPositionStream().listen((pos) {
+            if (apiC.api.hasToken && apiC.state is! ApiTokenDeleted) {
+              if (i % 20 == 0) {
+                apiC.api.editCurrentUserGeolocation(GeolocationPosition(
+                  latitude: pos.latitude,
+                  longitude: pos.longitude,
+                ));
+              }
+              locationC.updateUserLocation(LatLng(pos.latitude, pos.longitude));
+              i++;
+            } else {
+              showError('Token was deleted');
+              streamSub.cancel();
+            }
           });
           return locationC;
         }),
@@ -54,11 +69,15 @@ class MapScreen extends StatelessWidget {
             Builder(builder: (context) {
               final apiC = context.read<ApiCubit>();
 
-              apiC.api.getAllStructures().then((value) =>
-                  context.read<GeometryCubit>().loadStructuresToMap(value));
+              try {
+                apiC.api.getAllStructures().then((value) =>
+                    context.read<GeometryCubit>().loadStructuresToMap(value));
 
-              apiC.api.getAllGeolocation(excludeUser: true).then((value) =>
-                  context.read<LocationCubit>().updateOthersLocation(value));
+                apiC.api.getAllGeolocation(excludeUser: true).then((value) =>
+                    context.read<LocationCubit>().updateOthersLocation(value));
+              } catch (e) {
+                showError('Error while map update');
+              }
 
               return MapWidget();
             }),
@@ -79,6 +98,8 @@ class MapScreen extends StatelessWidget {
                         if (!state.isViewLocked && !state.isLocationZero)
                           const SizedBox(height: 5),
                         ResetRotationButton(value: state.isLocationZero),
+                        const SizedBox(height: 5),
+                        const UserSettingsButton(),
                       ],
                     );
                   },

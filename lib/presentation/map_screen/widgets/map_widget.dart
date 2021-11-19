@@ -8,6 +8,7 @@ import '../bloc/geometry_cubit.dart';
 import '../bloc/locations_cubit.dart';
 import '../bloc/map_view_cubit.dart';
 import 'package:variscite_mobile/utils/geometry/map_geometry.dart';
+import 'package:variscite_mobile/utils/geometry/locations_collection.dart';
 import 'package:variscite_mobile/utils/consts.dart';
 
 class MapWidget extends StatelessWidget {
