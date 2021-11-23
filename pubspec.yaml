@@ -1,5 +1,5 @@
 name: variscite_mobile
-description: A new Flutter project.
+description: Mobile client for Variscite API
 publish_to: 'none'
 version: 0.3.0+3
 
@@ -9,10 +9,8 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  variscite_dart:
-    path: ../variscite_dart
+  variscite_dart: ^0.1.4
   flutter_map: ^0.14.0
-  dio: ^4.0.0
   geolocator: ^7.6.2
   cached_network_image: ^3.1.0
   geojson_vi: ^2.0.3
