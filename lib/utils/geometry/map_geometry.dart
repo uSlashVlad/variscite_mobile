@@ -66,6 +66,12 @@ class MapGeometry extends Equatable {
         lines.add(structure);
       } else if (structure is Polygon) {
         polygons.add(structure);
+      } else if (structure is List<Marker>) {
+        markers.addAll(structure);
+      } else if (structure is List<Polyline>) {
+        lines.addAll(structure);
+      } else if (structure is List<Polygon>) {
+        polygons.addAll(structure);
       }
     }
     return MapGeometry(
@@ -92,7 +98,6 @@ class MapGeometry extends Equatable {
         for (var coordinates in line.coordinates) {
           points.add(GeometryHelper.convertLngLatList(coordinates));
         }
-        // TODO use opacity property in polyline
         return Polyline(
           points: points,
           color: style.strokeColor,
@@ -114,7 +119,6 @@ class MapGeometry extends Equatable {
           }
           holePoints.add(holes);
         }
-        // TODO use opacity property in polygon
         return Polygon(
           points: points,
           holePointsList: holePoints,
@@ -123,15 +127,61 @@ class MapGeometry extends Equatable {
           borderStrokeWidth: style.strokeWidth,
         );
 
-      // TODO implement complex geometries
-      // case GeoJSONType.multiPoint:
-      //   break;
-      // case GeoJSONType.multiLineString:
-      //   break;
-      // case GeoJSONType.multiPolygon:
-      //   break;
-      // case GeoJSONType.geometryCollection:
-      //   break;
+      case GeoJSONType.multiPoint:
+        final mPoint = feature.geometry as GeoJSONMultiPoint;
+        final style = _parseMarkerStyle(feature.properties);
+        final markers = <Marker>[];
+        for (var coordinates in mPoint.coordinates) {
+          markers.add(Marker(
+            point: GeometryHelper.convertLngLatList(coordinates),
+            builder: (context) => MarkerWidget(style: style),
+          ));
+        }
+        return markers;
+
+      case GeoJSONType.multiLineString:
+        final line = feature.geometry as GeoJSONMultiLineString;
+        final style = _parseLineStyle(feature.properties);
+        final lines = <Polyline>[];
+        for (var coordinates in line.coordinates) {
+          final points = <LatLng>[];
+          for (var c in coordinates) {
+            points.add(GeometryHelper.convertLngLatList(c));
+          }
+          lines.add(Polyline(
+            points: points,
+            color: style.strokeColor,
+            strokeWidth: style.strokeWidth,
+          ));
+        }
+        return lines;
+
+      case GeoJSONType.multiPolygon:
+        final polygon = feature.geometry as GeoJSONMultiPolygon;
+        final style = _parsePolygonStyle(feature.properties);
+        final polygons = <Polygon>[];
+        for (var coorinates in polygon.coordinates) {
+          final points = <LatLng>[];
+          for (var c in coorinates[0]) {
+            points.add(GeometryHelper.convertLngLatList(c));
+          }
+          final holePoints = <List<LatLng>>[];
+          for (var i = 1; i < polygon.coordinates.length; i++) {
+            final holes = <LatLng>[];
+            for (var c in coorinates[i]) {
+              holes.add(GeometryHelper.convertLngLatList(c));
+            }
+            holePoints.add(holes);
+          }
+          polygons.add(Polygon(
+            points: points,
+            holePointsList: holePoints,
+            color: style.fillColor,
+            borderColor: style.strokeColor,
+            borderStrokeWidth: style.strokeWidth,
+          ));
+        }
+        return polygons;
 
       default:
         return null;
