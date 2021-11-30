@@ -10,4 +10,9 @@ class GeometryCubit extends Cubit<MapGeometry> {
   void loadStructuresToMap(List<GeoStruct> structs) {
     emit(MapGeometry.createFromStructures(structs));
   }
+
+  void addStructure(GeoStruct struct) {
+    final newGeometry = MapGeometry.createFromStructures([struct]);
+    emit(state.mergeWith(newGeometry));
+  }
 }

@@ -8,7 +8,7 @@ import 'package:variscite_dart/variscite_dart.dart';
 import 'widgets/map_widget.dart';
 import 'widgets/map_ui_buttons.dart';
 import 'package:variscite_mobile/bloc/api_cubit.dart';
-import 'bloc/geometry_cubit.dart';
+import '../../bloc/geometry_cubit.dart';
 import 'bloc/locations_cubit.dart';
 import 'bloc/map_view_cubit.dart';
 import 'package:variscite_mobile/utils/consts.dart';
@@ -25,7 +25,6 @@ class MapScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(create: (context) => GeometryCubit()),
         BlocProvider(create: (context) {
           final locationC = LocationCubit();
           final apiC = context.read<ApiCubit>();
@@ -100,6 +99,8 @@ class MapScreen extends StatelessWidget {
                         ResetRotationButton(value: state.isLocationZero),
                         const SizedBox(height: 5),
                         const UserSettingsButton(),
+                        const SizedBox(height: 5),
+                        const StructAddButton(),
                       ],
                     );
                   },

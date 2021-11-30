@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../bloc/map_view_cubit.dart';
 import 'package:variscite_mobile/presentation/user_screen/user_screen.dart';
+import 'package:variscite_mobile/presentation/struct_import_screen/struct_import_screen.dart';
 
 class LocatorButton extends StatelessWidget {
   const LocatorButton({
@@ -56,6 +57,22 @@ class UserSettingsButton extends StatelessWidget {
       backgroundColor: theme.primaryColor,
       color: theme.iconTheme.color,
       onPressed: () => Navigator.pushNamed(context, UserScreen.route),
+    );
+  }
+}
+
+class StructAddButton extends StatelessWidget {
+  const StructAddButton({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return MapUiButton(
+      Icons.edit,
+      backgroundColor: theme.primaryColor,
+      color: theme.iconTheme.color,
+      onPressed: () => Navigator.pushNamed(context, StructImportScreen.route),
     );
   }
 }
