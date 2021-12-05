@@ -11,15 +11,6 @@ class MapViewState extends Equatable {
   List<Object?> get props => [isViewLocked, isLocationZero];
 }
 
-// class DefaultMapViewState extends MapViewState {
-//   const DefaultMapViewState(
-//       {bool isViewLocked = false, bool isLocationZero = true})
-//       : super(
-//           isViewLocked: isViewLocked,
-//           isLocationZero: isLocationZero,
-//         );
-// }
-
 class MapViewCubit extends Cubit<MapViewState> {
   MapViewCubit() : super(const MapViewState());
 

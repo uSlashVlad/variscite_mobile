@@ -6,7 +6,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:variscite_dart/variscite_dart.dart';
 
 import 'widgets/map_widget.dart';
-import 'widgets/map_ui_buttons.dart';
+import 'widgets/default_buttons.dart';
 import 'package:variscite_mobile/bloc/api_cubit.dart';
 import '../../bloc/geometry_cubit.dart';
 import 'bloc/locations_cubit.dart';
@@ -98,9 +98,9 @@ class MapScreen extends StatelessWidget {
                           const SizedBox(height: 5),
                         ResetRotationButton(value: state.isLocationZero),
                         const SizedBox(height: 5),
-                        const UserSettingsButton(),
-                        const SizedBox(height: 5),
                         const StructAddButton(),
+                        const SizedBox(height: 5),
+                        const UserSettingsButton(),
                       ],
                     );
                   },
